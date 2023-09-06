@@ -1,14 +1,16 @@
 import express, { urlencoded } from 'express';
 import studentData from './MOCK_DATA.json' assert { type: "json" };
-import multer from 'multer';
+import multer from 'multer';//module for upload handling
 
 
 const app = express();
 const PORT = 3000;
 
 //MIDDLEWARES
+//for form submission
 app.use(urlencoded({ extended: true }));
 
+//for uploading
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         return cb(null, "./uploads");
@@ -42,7 +44,6 @@ app.get('/student/api/:id', (req, res) => {
 });
 
 //POST
-
 app.post('/student/api', upload.single("image"), (req, res) => {
 
     console.log(req.body)
