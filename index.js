@@ -1,12 +1,26 @@
 import express, { urlencoded } from 'express';
 import studentData from './MOCK_DATA.json' assert { type: "json" };
+import multer from 'multer';
 
 
 const app = express();
 const PORT = 3000;
 
+//MIDDLEWARES
+app.use(urlencoded({ extended: true }));
 
-app.use(urlencoded({ extended: false }));
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        return cb(null, "./uploads");
+    },
+    filename: (req, file, cb) => {
+        return cb(null, `${req.params.id == undefined ? studentData.length + 1 : req.params.id}_${file.originalname}`);
+    },
+});
+const upload = multer({ storage });
+
+
+
 
 //Routes
 //GET
@@ -29,12 +43,16 @@ app.get('/student/api/:id', (req, res) => {
 
 //POST
 
-app.post('/student/api', (req, res) => {
+app.post('/student/api', upload.single("image"), (req, res) => {
+
+    console.log(req.body)
+    console.log(req.file.path)
     const student = {
         roll_no: studentData.length + 1,
         first_name: req.body.first_name,
         last_name: req.body.last_name,
         email: req.body.email,
+        image: String(req.file.filename),
     };
     studentData.push(student);
     return res.json(student);
@@ -43,7 +61,7 @@ app.post('/student/api', (req, res) => {
 
 //PUT
 
-app.put('/student/api/:id', (req, res) => {
+app.put('/student/api/:id', upload.single("image"), (req, res) => {
     const id = Number(req.params.id);
     const student = studentData.find((student) => student.roll_no === id);
     if (!student) {
@@ -52,7 +70,7 @@ app.put('/student/api/:id', (req, res) => {
     student.first_name !== req.body.first_name && req.body.first_name != undefined ? student.first_name = req.body.first_name : student.first_name;
     student.last_name !== req.body.last_name && req.body.last_name != undefined ? student.last_name = req.body.last_name : student.last_name;
     student.email !== req.body.email && req.body.email != undefined ? student.email = req.body.email : student.email;
-
+    student.image !== String(req.file.filename) && String(req.file.filename) != undefined ? student.image = String(req.file.filename) : student.image;
 
     return res.json(student);
 });
