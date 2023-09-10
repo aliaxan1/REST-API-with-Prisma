@@ -1,6 +1,50 @@
 import express, { urlencoded } from 'express';
 import studentData from './MOCK_DATA.json' assert { type: "json" };
 import multer from 'multer';//module for upload handling
+import mongoose from "mongoose";
+
+//Database connection
+    try {
+        const conn = await mongoose.connect("mongodb://127.0.0.1:27017/Student");
+        console.log(`MongoDB connected: ${conn.connection.host}`);
+    } catch (error) {
+        console.log(`Error: ${error.message}`);
+        process.exit(1);
+    }
+    
+
+
+
+ //Schema
+
+
+const studentSchema = mongoose.Schema({
+    roll_no: {
+        type: Number,
+        required: true,
+        unique: true,
+    },
+    first_name: {
+        type: String,
+        required: true,
+    },
+    last_name: {
+        type:String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    image: {
+        type: String,
+        required: true,
+    },
+});
+
+const Student = mongoose.model("Student", studentSchema);
+
 
 
 const app = express();
@@ -44,19 +88,20 @@ app.get('/student/api/:id', (req, res) => {
 });
 
 //POST
-app.post('/student/api', upload.single("image"), (req, res) => {
+app.post('/student/api', upload.single("image"),async (req, res) => {
 
     console.log(req.body)
     console.log(req.file.path)
-    const student = {
-        roll_no: studentData.length + 1,
+    const dataUploaded = await Student.create({
+        roll_no: req.body.roll_no,
         first_name: req.body.first_name,
         last_name: req.body.last_name,
         email: req.body.email,
         image: String(req.file.filename),
-    };
-    studentData.push(student);
-    return res.json(student);
+    });
+
+    return res.json(dataUploaded);
+
 });
 
 
