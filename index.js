@@ -1,52 +1,11 @@
-import express, { urlencoded } from 'express';
+import express, { query, urlencoded } from 'express';
 import studentData from './MOCK_DATA.json' assert { type: "json" };
 import multer from 'multer';//module for upload handling
-import mongoose from "mongoose";
-
-//Database connection
-    try {
-        const conn = await mongoose.connect("mongodb://127.0.0.1:27017/Student");
-        console.log(`MongoDB connected: ${conn.connection.host}`);
-    } catch (error) {
-        console.log(`Error: ${error.message}`);
-        process.exit(1);
-    }
-    
+import Student from './dbCon.js';
 
 
 
- //Schema
-
-
-const studentSchema = mongoose.Schema({
-    roll_no: {
-        type: Number,
-        required: true,
-        unique: true,
-    },
-    first_name: {
-        type: String,
-        required: true,
-    },
-    last_name: {
-        type:String,
-        required: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    image: {
-        type: String,
-        required: true,
-    },
-});
-
-const Student = mongoose.model("Student", studentSchema);
-
-
-
+//Express
 const app = express();
 const PORT = 3000;
 
@@ -74,13 +33,16 @@ app.get('/', (req, res) => {
     res.send(`HOME PAGE`);
 });
 
-app.get('/student/api', (req, res) => {
-    return res.json(studentData);
+app.get('/student/api', async (req, res) => {
+    const allStudents = await Student.find({});
+    // console.log(allStudents)
+    return res.json(allStudents);
 });
 
-app.get('/student/api/:id', (req, res) => {
+app.get('/student/api/:id',async (req, res) => {
     const id = Number(req.params.id);
-    const student = studentData.find((student) => student.roll_no === id);
+    const query = { roll_no: id };
+    const student = await Student.findOne(query);
     if (!student) {
         return res.send(`No student with id ${id}`);
     }
