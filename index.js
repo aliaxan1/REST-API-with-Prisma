@@ -69,31 +69,30 @@ app.post('/student/api', upload.single("image"),async (req, res) => {
 
 //PUT
 
-app.put('/student/api/:id', upload.single("image"), (req, res) => {
+app.put('/student/api/:id', upload.single("image"),async (req, res) => {
     const id = Number(req.params.id);
-    const student = studentData.find((student) => student.roll_no === id);
-    if (!student) {
+    const studentTUpdate =await Student.findOneAndUpdate({ roll_no: id }, {
+        first_name: req.body.first_name,
+        last_name: req.body.last_name,
+        email: req.body.email,
+        image: String(req.file.filename),
+    }, { new: true });
+    if (!studentTUpdate) {
         return res.send(`No student with id ${id}`);
     }
-    student.first_name !== req.body.first_name && req.body.first_name != undefined ? student.first_name = req.body.first_name : student.first_name;
-    student.last_name !== req.body.last_name && req.body.last_name != undefined ? student.last_name = req.body.last_name : student.last_name;
-    student.email !== req.body.email && req.body.email != undefined ? student.email = req.body.email : student.email;
-    student.image !== String(req.file.filename) && String(req.file.filename) != undefined ? student.image = String(req.file.filename) : student.image;
 
-    return res.json(student);
+    return res.json(studentTUpdate);
 });
 
 //DELETE
 
-app.delete('/student/api/:id', (req, res) => {
+app.delete('/student/api/:id',async (req, res) => {
     const id = Number(req.params.id);
-    const student = studentData.find((student) => student.roll_no === id);
-    if (!student) {
+    const studentToDelete =await Student.findOneAndDelete({ roll_no: id });
+    if (!studentToDelete) {
         return res.send(`No student with id ${id}`);
     }
-    const index = studentData.indexOf(student);
-    studentData.splice(index, 1);
-    return res.json(student);
+    return res.json(studentToDelete);
 });
 
 
