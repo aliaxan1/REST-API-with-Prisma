@@ -1,5 +1,4 @@
 import express, { query, urlencoded } from 'express';
-import studentData from './MOCK_DATA.json' assert { type: "json" };
 import multer from 'multer';//module for upload handling
 import Student from './dbCon.js';
 
@@ -10,6 +9,7 @@ const app = express();
 const PORT = 3000;
 
 //MIDDLEWARES
+
 //for form submission
 app.use(urlencoded({ extended: true }));
 
@@ -19,15 +19,15 @@ const storage = multer.diskStorage({
         return cb(null, "./uploads");
     },
     filename: (req, file, cb) => {
-        return cb(null, `${req.params.id == undefined ? studentData.length + 1 : req.params.id}_${file.originalname}`);
+        return cb(null, `${req.params.id}_${file.originalname}`);
     },
 });
 const upload = multer({ storage });
 
 
 
-
 //Routes
+
 //GET
 app.get('/', (req, res) => {
     res.send(`HOME PAGE`);
