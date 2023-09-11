@@ -34,7 +34,8 @@ app.get('/', (req, res) => {
 });
 
 app.get('/student/api', async (req, res) => {
-    const allStudents = await Student.find({});
+    const query = {}; // for all enteries in DB.
+    const allStudents = await Student.find( query );
     // console.log(allStudents)
     return res.json(allStudents);
 });
@@ -71,7 +72,8 @@ app.post('/student/api', upload.single("image"),async (req, res) => {
 
 app.put('/student/api/:id', upload.single("image"),async (req, res) => {
     const id = Number(req.params.id);
-    const studentTUpdate =await Student.findOneAndUpdate({ roll_no: id }, {
+    const query = { roll_no: id };
+    const studentTUpdate =await Student.findOneAndUpdate( query , {
         first_name: req.body.first_name,
         last_name: req.body.last_name,
         email: req.body.email,
@@ -88,7 +90,8 @@ app.put('/student/api/:id', upload.single("image"),async (req, res) => {
 
 app.delete('/student/api/:id',async (req, res) => {
     const id = Number(req.params.id);
-    const studentToDelete =await Student.findOneAndDelete({ roll_no: id });
+    const query = { roll_no: id };
+    const studentToDelete =await Student.findOneAndDelete( query );
     if (!studentToDelete) {
         return res.send(`No student with id ${id}`);
     }
