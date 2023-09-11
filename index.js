@@ -68,9 +68,9 @@ app.post('/student/api', upload.single("image"),async (req, res) => {
 });
 
 
-//PUT
+//PATCH
 
-app.put('/student/api/:id', upload.single("image"),async (req, res) => {
+app.patch('/student/api/:id', upload.single("image"),async (req, res) => {
     const id = Number(req.params.id);
     const query = { roll_no: id };
     const studentTUpdate =await Student.findOneAndUpdate( query , {
