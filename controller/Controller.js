@@ -1,4 +1,7 @@
-import Student from '../models/Student.js';
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+// use `prisma` in your application to read and write data in your DB
 
 
 async function homeRouteController(req, res) {
@@ -7,9 +10,7 @@ async function homeRouteController(req, res) {
 
 
 async function getAllRouteController(req, res) {
-    const query = {}; // for all enteries in DB.
-    const allStudents = await Student.find(query);
-    // console.log(allStudents)
+    const allStudents = await prisma.Student.findMany();
     return res.json(allStudents);
 }
 
@@ -17,7 +18,9 @@ async function getAllRouteController(req, res) {
 async function getByRollNoRouteController(req, res) {
     const id = Number(req.params.id);
     const query = { roll_no: id };
-    const student = await Student.findOne(query);
+    const student = await prisma.student.findUnique({
+        where: query,
+      });    
     if (!student) {
         return res.send(`No student with id ${id}`);
     }
@@ -26,14 +29,16 @@ async function getByRollNoRouteController(req, res) {
 
 
 async function createRouteController(req, res) {
-    const dataUploaded = await Student.create({
-        roll_no: req.body.roll_no,
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
-        email: req.body.email,
-        image: String(req.file.filename),
-    });
+    // console.log(req.body);
+    const dataUploaded =await prisma.student.create({
 
+        data: {
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
+            email: req.body.email,
+          },
+    });
+    console.log(dataUploaded);
     return res.json(dataUploaded);
 }
 
@@ -41,12 +46,14 @@ async function createRouteController(req, res) {
 async function updateByRollNoRouteController(req, res) {
     const id = Number(req.params.id);
     const query = { roll_no: id };
-    const studentTUpdate = await Student.findOneAndUpdate(query, {
+    const studentTUpdate = await prisma.student.update({
+        where: query,
+        data: {
         first_name: req.body.first_name,
         last_name: req.body.last_name,
         email: req.body.email,
-        image: String(req.file.filename),
-    }, { new: true });
+    }
+      });
     if (!studentTUpdate) {
         return res.send(`No student with id ${id}`);
     }
@@ -58,14 +65,14 @@ async function updateByRollNoRouteController(req, res) {
 async function deleteByRollNoRouteController(req, res) {
     const id = Number(req.params.id);
     const query = { roll_no: id };
-    const studentToDelete = await Student.findOneAndDelete(query);
+    const studentToDelete = await prisma.student.delete({
+        where: query,
+      });
     if (!studentToDelete) {
         return res.send(`No student with id ${id}`);
     }
     return res.json(studentToDelete);
 }
-
-
 
 
 export {

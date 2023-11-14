@@ -1,18 +1,17 @@
 import express, { query, urlencoded } from 'express';
-import connectDB from './dbCon.js';
 import userRouter from './routes/Routes.js';
+
 
 
 //Express
 const app = express();
 const PORT = 3000;
-//DB connection
-connectDB("mongodb://127.0.0.1:27017/Student");
 
-//MIDDLEWARE
-//for form submission
-app.use(urlencoded({ extended: true }));
+// Middleware
+app.use(express.json()); // for parsing application/json
 
+// If you're dealing with URL-encoded data, use the following line
+app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 
 
